@@ -16,8 +16,7 @@ namespace ONLINE_SHOPPING_API.Repositories
 
         private IDbConnection CreateConnection()
         {
-            return new SqlConnection(
-                _configuration.GetConnectionString("DefaultConnection"));
+            return new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
         }
 
         public async Task<int> RegisterCustomer(Customer customer)
@@ -33,28 +32,22 @@ namespace ONLINE_SHOPPING_API.Repositories
             param.Add("@custEmail", customer.CustEmail);
             param.Add("@custpassword", customer.CustPassword);
 
-            return await connection.ExecuteAsync(
-                "sp_Customer",
-                param,
-                commandType: CommandType.StoredProcedure);
+            return await connection.ExecuteAsync( "sp_Customer", param,commandType: CommandType.StoredProcedure);
         }
 
-        public async Task<Customer?> LoginCustomer(
-            string email,
-            string password)
+        public async Task<Customer?> LoginCustomer(string email, string password)
         {
-            using var connection = CreateConnection();
+            var customer = await GetCustomerByEmail(email);
 
-            var param = new DynamicParameters();
+            if (customer == null)
+                return null;
 
-            param.Add("@action", "LOGIN");
-            param.Add("@custEmail", email);
-            param.Add("@custpassword", password);
+            bool validPassword = BCrypt.Net.BCrypt.Verify( password, customer.CustPassword);
 
-            return await connection.QueryFirstOrDefaultAsync<Customer>(
-                "sp_Customer",
-                param,
-                commandType: CommandType.StoredProcedure);
+            if (!validPassword)
+                return null;
+
+            return customer;
         }
 
         public async Task<Customer?> GetCustomerById(int custId)
@@ -66,10 +59,7 @@ namespace ONLINE_SHOPPING_API.Repositories
             param.Add("@action", "GET");
             param.Add("@custId", custId);
 
-            return await connection.QueryFirstOrDefaultAsync<Customer>(
-                "sp_Customer",
-                param,
-                commandType: CommandType.StoredProcedure);
+            return await connection.QueryFirstOrDefaultAsync<Customer>("sp_Customer",   param,   commandType: CommandType.StoredProcedure);
         }
         public async Task<Customer?> GetCustomerByEmail(string email)
         {
@@ -80,13 +70,8 @@ namespace ONLINE_SHOPPING_API.Repositories
             param.Add("@action", "GETBYEMAIL");
             param.Add("@custEmail", email);
 
-            return await connection.QueryFirstOrDefaultAsync<Customer>(
-                "sp_Customer",
-                param,
-                commandType: CommandType.StoredProcedure);
+            return await connection.QueryFirstOrDefaultAsync<Customer>(  "sp_Customer", param, commandType: CommandType.StoredProcedure);
         }
-
-
         public async Task<IEnumerable<Customer>> GetAllCustomers()
         {
             using var connection = CreateConnection();

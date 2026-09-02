@@ -16,16 +16,15 @@ namespace ONLINE_SHOPPING_API.Services
 
         public async Task<int> Register(CustomerRegisterDto dto)
         {
-            // Check whether email already exists
+          
             var existingCustomer =
                 await _customerRepository.GetCustomerByEmail(dto.CustEmail);
 
             if (existingCustomer != null)
                 return 0;
 
-            // Hash password before storing
-            string hashedPassword =
-                BCrypt.Net.BCrypt.HashPassword(dto.CustPassword);
+           
+            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(dto.CustPassword);
 
             var customer = new Customer
             {
@@ -41,23 +40,8 @@ namespace ONLINE_SHOPPING_API.Services
 
         public async Task<Customer?> Login(LoginDto dto)
         {
-            // Get customer using email
-            var customer =
-                await _customerRepository.GetCustomerByEmail(dto.Email);
 
-            if (customer == null)
-                return null;
-
-            // Verify plain password against BCrypt hash
-            bool validPassword =
-                BCrypt.Net.BCrypt.Verify(
-                    dto.Password,
-                    customer.CustPassword);
-
-            if (!validPassword)
-                return null;
-
-            return customer;
+            return  await _customerRepository.LoginCustomer(dto.Email,dto.Password);
         }
 
         public async Task<Customer?> GetCustomer(int custId)
@@ -86,7 +70,6 @@ namespace ONLINE_SHOPPING_API.Services
             customer.CustPhone = dto.CustPhone;
             customer.CustEmail = dto.CustEmail;
 
-            // Don't change password during profile update
             return await _customerRepository.UpdateCustomer(customer);
         }
 
@@ -100,7 +83,6 @@ namespace ONLINE_SHOPPING_API.Services
             if (customer == null)
                 return false;
 
-            // Verify old password
             bool validPassword =
                 BCrypt.Net.BCrypt.Verify(
                     dto.OldPassword,
@@ -109,7 +91,6 @@ namespace ONLINE_SHOPPING_API.Services
             if (!validPassword)
                 return false;
 
-            // Hash new password
             string newHash =
                 BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
 

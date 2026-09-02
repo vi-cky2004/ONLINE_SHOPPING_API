@@ -50,10 +50,7 @@ namespace ONLINE_SHOPPING_API.Controllers
             if (customer == null)
                 return Unauthorized("Invalid email or password.");
 
-            var token = _jwtService.GenerateToken(
-                customer.CustId,
-                customer.CustName,
-                "Customer");
+            var token = _jwtService.GenerateToken(customer.CustId, customer.CustName,"Customer");
 
             return Ok(new
             {
