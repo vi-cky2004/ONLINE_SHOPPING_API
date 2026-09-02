@@ -9,7 +9,7 @@ namespace ONLINE_SHOPPING_API.Controllers
     [Route("api/[controller]")]
     [ApiController]
 
-        [Authorize]
+    [Authorize]
         public class ProductController : ControllerBase
         {
             private readonly IProductService _productService;
@@ -56,19 +56,16 @@ namespace ONLINE_SHOPPING_API.Controllers
 
             [Authorize(Roles = "Admin")]
             [HttpPut("{prdId}")]
-            public async Task<IActionResult> UpdateProduct(
-                int prdId,
-                Product product)
+            public async Task<IActionResult> UpdateProduct(int prdId, Product product)
             {
                 if (!ModelState.IsValid)
-                    return BadRequest(ModelState);
-
+                return BadRequest(ModelState);
                 product.PrdId = prdId;
 
                 var result = await _productService.UpdateProduct(product);
 
                 if (!result)
-                    return NotFound("Product not found");
+                return NotFound("Product not found");
 
                 return Ok("Product updated successfully");
             }

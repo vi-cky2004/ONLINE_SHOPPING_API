@@ -21,8 +21,7 @@ namespace ONLINE_SHOPPING_API.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register(
-            CustomerRegisterDto dto)
+        public async Task<IActionResult> Register( CustomerRegisterDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

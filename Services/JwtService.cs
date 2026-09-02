@@ -21,17 +21,13 @@ namespace ONLINE_SHOPPING_API.Services
         {
             var jwt = _configuration.GetSection("Jwt");
 
-            var key = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(jwt["Key"]!));
+            var key = new SymmetricSecurityKey( Encoding.UTF8.GetBytes(jwt["Key"]!));
 
-            var credentials = new SigningCredentials(
-                key,
-                SecurityAlgorithms.HmacSha256);
+            var credentials = new SigningCredentials(key,SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
             {
-                new Claim(ClaimTypes.NameIdentifier,
-                    userId.ToString()),
+                new Claim(ClaimTypes.NameIdentifier,userId.ToString()),
 
                 new Claim(ClaimTypes.Name, name),
 
@@ -42,13 +38,11 @@ namespace ONLINE_SHOPPING_API.Services
                 issuer: jwt["Issuer"],
                 audience: jwt["Audience"],
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(
-                    Convert.ToDouble(jwt["ExpiryMinutes"])),
+                expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(jwt["ExpiryMinutes"])),
                 signingCredentials: credentials
             );
 
-            return new JwtSecurityTokenHandler()
-                .WriteToken(token);
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 }
