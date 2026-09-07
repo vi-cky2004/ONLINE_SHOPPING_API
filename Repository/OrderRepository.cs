@@ -35,10 +35,7 @@ namespace ONLINE_SHOPPING_API.Repositories
                 commandType: CommandType.StoredProcedure);
         }
 
-        public async Task<bool> AddOrderDetail(
-            int orderId,
-            int prdId,
-            int quantity)
+        public async Task<bool> AddOrderDetail(int orderId,  int prdId,   int quantity)
         {
             using var connection = CreateConnection();
 
