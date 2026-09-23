@@ -33,9 +33,9 @@ namespace ONLINE_SHOPPING_API.Controllers
         [Authorize(Roles = "Customer")]
         [HttpPost("{orderId}/details")]
         public async Task<IActionResult> AddOrderDetail(
-            int orderId,
-            int prdId,
-            int quantity)
+      int orderId,
+      int prdId,
+      int quantity)
         {
             var result = await _orderService.AddOrderDetail(
                 orderId,
@@ -43,9 +43,15 @@ namespace ONLINE_SHOPPING_API.Controllers
                 quantity);
 
             if (!result)
-                return BadRequest("Unable to add product to order.");
+                return BadRequest(new
+                {
+                    message = "Unable to add product to order."
+                });
 
-            return Ok("Product added to order successfully.");
+            return Ok(new
+            {
+                message = "Product added to order successfully."
+            });
         }
 
 

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ONLINE_SHOPPING_API.Models
 {
@@ -29,5 +30,8 @@ namespace ONLINE_SHOPPING_API.Models
         [StringLength(500,
             ErrorMessage = "Image path cannot exceed 500 characters")]
         public string PrdImage { get; set; }
+
+        [NotMapped]
+        public IFormFile? ImageFile { get; set; }
     }
 }

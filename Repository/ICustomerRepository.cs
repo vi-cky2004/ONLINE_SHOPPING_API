@@ -6,7 +6,7 @@ namespace ONLINE_SHOPPING_API.Repositories
     {
         Task<int> RegisterCustomer(Customer customer);
 
-        Task<Customer?> LoginCustomer(string email, string password);
+        Task<LoginUser?> LoginCustomer(string email);
 
         Task<Customer?> GetCustomerById(int custId);
         Task<Customer?> GetCustomerByEmail(string custEmail);

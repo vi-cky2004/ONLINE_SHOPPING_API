@@ -51,7 +51,7 @@ namespace ONLINE_SHOPPING_API.Repositories
                 param,
                 commandType: CommandType.StoredProcedure);
 
-            return rows > 0;
+            return true;
         }
 
         public async Task<IEnumerable<dynamic>> GetOrder(int orderId)

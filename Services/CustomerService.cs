@@ -38,10 +38,21 @@ namespace ONLINE_SHOPPING_API.Services
             return await _customerRepository.RegisterCustomer(customer);
         }
 
-        public async Task<Customer?> Login(LoginDto dto)
+        public async Task<LoginUser?> Login(LoginDto dto)
         {
+            var user = await _customerRepository.LoginCustomer(dto.Email);
 
-            return  await _customerRepository.LoginCustomer(dto.Email,dto.Password);
+            if (user == null)
+                return null;
+
+            bool validPassword = BCrypt.Net.BCrypt.Verify(
+                dto.Password,
+                user.UserPassword);
+
+            if (!validPassword)
+                return null;
+
+            return user;
         }
 
         public async Task<Customer?> GetCustomer(int custId)
@@ -73,9 +84,7 @@ namespace ONLINE_SHOPPING_API.Services
             return await _customerRepository.UpdateCustomer(customer);
         }
 
-        public async Task<bool> ChangePassword(
-            int custId,
-            ChangePasswordDto dto)
+        public async Task<bool> ChangePassword(  int custId, ChangePasswordDto dto)
         {
             var customer =
                 await _customerRepository.GetCustomerById(custId);
@@ -83,20 +92,14 @@ namespace ONLINE_SHOPPING_API.Services
             if (customer == null)
                 return false;
 
-            bool validPassword =
-                BCrypt.Net.BCrypt.Verify(
-                    dto.OldPassword,
-                    customer.CustPassword);
+            bool validPassword = BCrypt.Net.BCrypt.Verify(dto.OldPassword, customer.CustPassword);
 
             if (!validPassword)
                 return false;
 
-            string newHash =
-                BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+            string newHash =  BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
 
-            return await _customerRepository.ChangePassword(
-                custId,
-                newHash);
+            return await _customerRepository.ChangePassword( custId,newHash);
         }
 
         public async Task<bool> DeleteCustomer(int custId)

@@ -7,7 +7,7 @@ namespace ONLINE_SHOPPING_API.Services
     {
         Task<int> Register(CustomerRegisterDto dto);
 
-        Task<Customer?> Login(LoginDto dto);
+        Task<LoginUser?> Login(LoginDto dto);
 
         Task<Customer?> GetCustomer(int custId);
 

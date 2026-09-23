@@ -44,21 +44,22 @@ namespace ONLINE_SHOPPING_API.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var customer = await _customerService.Login(dto);
+            var user = await _customerService.Login(dto);
 
-            if (customer == null)
+            if (user == null)
                 return Unauthorized("Invalid email or password.");
 
             var token = _jwtService.GenerateToken(
-                customer.CustId,
-                customer.CustName,
-                "Customer");
+                user.UserId,
+                user.UserName,
+                user.Role);
 
             return Ok(new
             {
                 message = "Login successful",
                 token = token,
-                custId = customer.CustId
+                userId = user.UserId,
+                role = user.Role
             });
         }
 
@@ -90,15 +91,12 @@ namespace ONLINE_SHOPPING_API.Controllers
         [HttpPut("{custId}")]
         [Authorize(Roles = "Admin")]
 
-        public async Task<IActionResult> UpdateCustomer(
-            int custId,
-            CustomerRegisterDto dto)
+        public async Task<IActionResult> UpdateCustomer(int custId, CustomerRegisterDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var result =
-                await _customerService.UpdateCustomer(custId, dto);
+            var result =  await _customerService.UpdateCustomer(custId, dto);
 
             if (!result)
                 return NotFound("Customer not found.");
@@ -106,18 +104,16 @@ namespace ONLINE_SHOPPING_API.Controllers
             return Ok("Profile updated successfully.");
         }
 
-        [HttpPut("{custId}/change-password")]
+        [HttpPut("change-password")]
         [Authorize]
 
-        public async Task<IActionResult> ChangePassword(
-            int custId,
-            ChangePasswordDto dto)
+        public async Task<IActionResult> ChangePassword(ChangePasswordDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             var result =
-                await _customerService.ChangePassword(custId, dto);
+                await _customerService.ChangePassword(dto.CustId, dto);
 
             if (!result)
                 return BadRequest(

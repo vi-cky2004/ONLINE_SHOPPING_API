@@ -35,19 +35,20 @@ namespace ONLINE_SHOPPING_API.Repositories
             return await connection.ExecuteAsync( "sp_Customer", param,commandType: CommandType.StoredProcedure);
         }
 
-        public async Task<Customer?> LoginCustomer(string email, string password)
+        public async Task<LoginUser?> LoginCustomer(string email)
         {
-            var customer = await GetCustomerByEmail(email);
+            using var connection = CreateConnection();
 
-            if (customer == null)
-                return null;
+            var parameters = new DynamicParameters();
 
-            bool validPassword = BCrypt.Net.BCrypt.Verify( password, customer.CustPassword);
+            parameters.Add("@action", "CHECKLOGIN");
+            parameters.Add("@custEmail", email);
 
-            if (!validPassword)
-                return null;
-
-            return customer;
+            return await connection.QueryFirstOrDefaultAsync<LoginUser>(
+                "sp_Customer",
+                parameters,
+                commandType: CommandType.StoredProcedure
+            );
         }
 
         public async Task<Customer?> GetCustomerById(int custId)
@@ -99,17 +100,12 @@ namespace ONLINE_SHOPPING_API.Repositories
             param.Add("@custPhone", customer.CustPhone);
             param.Add("@custEmail", customer.CustEmail);
 
-            var rows = await connection.ExecuteAsync(
-                "sp_Customer",
-                param,
-                commandType: CommandType.StoredProcedure);
+            var rows = await connection.ExecuteAsync("sp_Customer", param,  commandType: CommandType.StoredProcedure);
 
             return rows > 0;
         }
 
-        public async Task<bool> ChangePassword(
-      int custId,
-      string newPassword)
+        public async Task<bool> ChangePassword(int custId,string newPassword)
         {
             using var connection = CreateConnection();
 
@@ -119,10 +115,7 @@ namespace ONLINE_SHOPPING_API.Repositories
             param.Add("@custId", custId);
             param.Add("@custpassword", newPassword);
 
-            var rows = await connection.ExecuteAsync(
-                "sp_Customer",
-                param,
-                commandType: CommandType.StoredProcedure);
+            var rows = await connection.ExecuteAsync("sp_Customer", param,commandType: CommandType.StoredProcedure);
 
             return rows > 0;
         }
